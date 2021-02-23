@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title> jQuery example - scrollable moving cards</title>
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        <style>
+            .container { width: 80%; margin: 2em auto; }
+            .movies-container { width: 100%; min-width: 600px; min-height: 400px; margin: 2em auto; overflow: hidden; }
+            .movies { margin: 0 auto; position: relative; }
+            .movie { width: 25em; float: left; text-align: center; }
+            .movie img { height: 12em; width: 8.5em; opacity: 0.5; }
+            .movie.selected img { height: 18em; width: 12.5em; opacity: 1.0; }
+            .movie { opacity: 0.5; }
+            .movie.selected { opacity: 1.0; }
+            .movie .intro .title { font: bold 1.2em Aerial; margin: 0.1em auto;}
+            .movie .intro .desc { width: 80%; margin: 0 auto; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h2> Movie Cards </h2>
+            <div class="movies-container" id="movies-container">
+                <div class="movies" id="movies">
+                </div>
+            </div>
+        </div>
+    </body>
+    <script>
+        $(document).ready(() => {
+            const movies = [
+                { img:"https://m.media-amazon.com/images/M/MV5BNDYxNjQyMjAtNTdiOS00NGYwLWFmNTAtNThmYjU5ZGI2YTI1XkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_FMjpg_UX800_.jpg", 
+                  intro: { title: "The avengers (2012)", desc: "Earth's mightiest heroes must come together and learn to fight as a team if they are going to stop the mischievous Loki and his alien army from enslaving humanity." } },
+                { img:"https://m.media-amazon.com/images/M/MV5BOGM2OWFmNGUtYzgwZi00Mzk3LWE2ZTMtMGQ0NGI2NjAwNjg5XkEyXkFqcGdeQXVyMTExNjIyMTc@._V1_FMjpg_UX1240_.jpg", 
+                  intro: { title: "Avengers: Age of Ultron (2015)", desc: "When Tony Stark and Bruce Banner try to jump-start a dormant peacekeeping program called Ultron, things go horribly wrong and it's up to Earth's mightiest heroes to stop the villainous Ultron from enacting his terrible plan." } },
+                { img:"https://m.media-amazon.com/images/M/MV5BMjMxNjY2MDU1OV5BMl5BanBnXkFtZTgwNzY1MTUwNTM@._V1_FMjpg_UY863_.jpg", 
+                  intro: { title: "Avengers: Infinity War (2018)", desc: "The Avengers and their allies must be willing to sacrifice all in an attempt to defeat the powerful Thanos before his blitz of devastation and ruin puts an end to the universe." } },
+                { img:"https://m.media-amazon.com/images/M/MV5BMTkxNTQzNTg4Nl5BMl5BanBnXkFtZTgwMzYzNDQ2NzM@._V1_FMjpg_UY863_.jpg", 
+                  intro: { title: "Avengers: Endgame (2019)", desc: "After the devastating events of Avengers: Infinity War (2018), the universe is in ruins. With the help of remaining allies, the Avengers assemble once more in order to reverse Thanos' actions and restore balance to the universe." } },
+                // { img:"https://m.media-amazon.com/images/M/MV5BMTA3OTg5NjUxNTdeQTJeQWpwZ15BbWU3MDg0MDE3NTQ@._V1_FMjpg_UX426_.jpg", 
+                  // intro: { title: "Iron Man", desc: "After being held captive in an Afghan cave, billionaire engineer Tony Stark creates a unique weaponized suit of armor to fight evil." } }
+            ];
+            
+            movies.forEach((movie, i) => {
+                let ele = $(`<div class="movie" id="movie-${i}"></div>`)
+                            .append($(`<div class="img"><img src="${movie.img}"></img></div>`))
+                            .append($(`<div class="intro">
+                                <div class="title">${movie.intro.title}</div>
+                                <div class="desc">${movie.intro.desc}</div></div>`));
+                if (i == 0) ele.addClass('selected');
+                $('#movies').append(ele);
+            });
+            $('#movies').width(`${movies.length * 25}em`)
+            // $('.movie img').first().height('18em').width('12.5em');
+
+            let movie_width = $('.movie').first().width(),
+                movies_con_width = $('#movies-container').width();
+            $('#movies').css('left', `${(movies_con_width - movie_width)/2}px`);
+
+            let animate_finish = true, cur_i = 0, movies_len = movies.length;
+            $('#movies-container').on('wheel', (event) => {
+                if (!animate_finish) return;
+                animate_finish = false;
+
+                const deltaY = event.originalEvent.deltaY;
+                // let movies_width = $('#movies').width(),
+                //     movies_left_offset = (movies_con_width - movie_width) / 2,
+                //     movies_right_offset = movies_left_offset - movies_width,
+                //     // cur_left = $('#movies').position().left;
+                //     cur_left = parseInt($('#movies').css('left'));
+                // movies_con_width = $('#movies-container').width();
+                let cur_left = parseInt($('#movies').css('left'));
+
+                if (deltaY > 0 && cur_i < movies_len - 1) {
+                    // DOWN
+                    let new_left = cur_left - movie_width;
+
+                    // $(`#movie-${cur_i} img`).animate({ height: '12em', width: '8.5em', opacity: '0.5' });
+                    // $(`#movie-${cur_i+1} img`).animate({ height: '18em', width: '12.5em', opacity: '1.0' });
+                    // $(`#movie-${cur_i}`).removeClass('selected');
+                    // $(`#movie-${cur_i+1}`).addClass('selected');
+                    $(`#movie-${cur_i} img`).animate({ height: '12em', width: '8.5em'});
+                    $(`#movie-${cur_i+1} img`).animate({ height: '18em', width: '12.5em'});
+                    $(`#movie-${cur_i}`).animate({ opacity: '0.5' }).removeClass('selected');
+                    $(`#movie-${cur_i+1}`).animate({ opacity: '1.0' }).addClass('selected');
+                    $('#movies').animate({ left: `${new_left}px`}, ()=> {
+                        animate_finish = true;
+                    });
+                    cur_i += 1;
+                } else if (deltaY < 0 && cur_i > 0){
+                    // UP
+                    let new_left = cur_left + movie_width;
+
+                    // $(`#movie-${cur_i} img`).animate({ height: '12em', width: '8.5em', opacity: '0.5' });
+                    // $(`#movie-${cur_i-1} img`).animate({ height: '18em', width: '12.5em', opacity: '1.0' });
+                    // $(`#movie-${cur_i}`).removeClass('selected');
+                    // $(`#movie-${cur_i-1}`).addClass('selected');
+                    $(`#movie-${cur_i} img`).animate({ height: '12em', width: '8.5em'});
+                    $(`#movie-${cur_i-1} img`).animate({ height: '18em', width: '12.5em'});
+                    $(`#movie-${cur_i}`).animate({ opacity: '0.5' }).removeClass('selected');
+                    $(`#movie-${cur_i-1}`).animate({ opacity: '1.0' }).addClass('selected');
+                    $('#movies').animate({ left: `${new_left}px`}, ()=> {
+                        animate_finish = true;
+                    });
+                    cur_i -= 1;
+                } else {
+                    animate_finish = true;
+                }
+            });
+        });
+    </script>
+</html>

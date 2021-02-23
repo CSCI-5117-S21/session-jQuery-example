@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title> jQuery example - scrollable moving cards</title>
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        <style>
+            .container { width: 80%; margin: 2em auto; font-size: 1.1em; }
+            .auto { margin: 1em auto; }
+            .auto input { 
+                width: 20em; padding: 0.5em 0; text-indent: 0.5em;
+                border: solid 1px #aaa; border-radius: 0.3em; font-size: 0.8em; 
+            }
+            .auto .auto-panel .list { 
+                position: absolute; z-index: 2; width: 20em; max-height: 10em; 
+                overflow-y: scroll; z-index: 2; display: none; font-size: 0.8em; 
+                border: solid 1px #aaa; border-radius: 0.3em; border-top: none; 
+                background: white;
+            }
+            .auto .auto-panel .list .item { 
+                padding: 0.2em 0; border-bottom: solid 1px #aaa; text-indent: 0.5em;
+            }
+            .auto .auto-panel .list .item:hover { cursor: pointer; background: #aaa; }
+            .auto .auto-panel .list .item:last-child { border: none; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h2> AutoCompletion </h2>
+            <div class="auto local-auto" id="local">
+                <div class="auto-panel label">
+                    <label for="local-input">Local autocompletion </label>
+                </div>
+                <div class="auto-panel input-panel">
+                    <input type="text" name="local" id="local-input" />
+                    <div class="list"></div>
+                </div>
+            </div>
+            <div class="auto remote-auto" id="remote">
+                <div class="auto-panel label">
+                    <label for="remote-input">Remote autocompletion </label>
+                </div>
+                <div class="auto-panel input-panel">
+                    <input type="text" name="remote" id="remote-input" />
+                    <div class="list"></div>
+                </div>
+            </div>
+        </div>
+    </body>
+    <script>
+        $(document).ready(() => {
+            const states = [
+                "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", 
+                "Delaware", "District Of Columbia", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", 
+                "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts",
+                "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", 
+                "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", 
+                "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota",
+                "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", 
+                "Wisconsin", "Wyoming"
+            ]; 
+            
+            $('#local-input').keyup(function () {
+                let val = $(this).val(), list = [];
+
+                if (val.length > 0) {
+                    states.forEach((state) => {
+                        if (state.toLowerCase().startsWith(val.toLowerCase()))
+                            list.push(state);
+                    });
+                }
+
+                let list_ele = $(this).parent().children('.list');
+                if (list.length > 0) {
+                    list_ele.empty();
+                    for (let item of list) {
+                        let item_ele = $(`<div class="item">${item}</div>`);
+                        item_ele.mousedown(
+                            () => { $('#local-input').val(item); list_ele.hide();  }
+                        );
+                        list_ele.append(item_ele);
+                    }
+                    list_ele.show();
+                } else {
+                    list_ele.hide();
+                }
+            }).blur(function (){
+                $(this).parent().children('.list').hide();
+            });
+        });
+    </script>
+</html>
