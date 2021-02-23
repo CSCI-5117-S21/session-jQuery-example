@@ -48,82 +48,11 @@
             </div>
         </div>
     </body>
+    <script src="/static/autocomplete.js"></script>
     <script>
         $(document).ready(() => {
-            const states = [
-                "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", 
-                "Delaware", "District Of Columbia", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", 
-                "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts",
-                "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", 
-                "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", 
-                "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota",
-                "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", 
-                "Wisconsin", "Wyoming"
-            ]; 
-            
-            $('#local-input').keyup(function () {
-                let val = $(this).val(), list = [];
-
-                if (val.length > 0) {
-                    states.forEach((state) => {
-                        if (state.toLowerCase().startsWith(val.toLowerCase()))
-                            list.push(state);
-                    });
-                }
-
-                let list_ele = $(this).parent().children('.list');
-                if (list.length > 0) {
-                    list_ele.empty();
-                    for (let item of list) {
-                        let item_ele = $(`<div class="item">${item}</div>`);
-                        item_ele.mousedown(
-                            () => { console.log(123); $('#local-input').val(item); list_ele.hide();  }
-                        );
-                        list_ele.append(item_ele);
-                    }
-                    list_ele.show();
-                } else {
-                    list_ele.hide();
-                }
-            }).blur(function (){
-                $(this).parent().children('.list').hide();
-            });
-
-
-            let timestamp = 0;
-            $('#remote-input').keyup(function () {
-                timestamp += 1;
-                let val = $(this).val(), list = [];
-                let list_ele = $(this).parent().children('.list');
-
-                if (val.length > 0) {
-                    $.get(`/getstates?k=${val}`, ((time) => {
-                        return function(data) {
-                            if (time == timestamp) {
-                                if (data.length > 0) {
-                                    list_ele.empty();
-                                    for (let item of data) {
-                                        let item_ele = $(`<div class="item">${item}</div>`);
-                                        item_ele.mousedown(
-                                            () => { $('#remote-input').val(item); list_ele.hide();  }
-                                        );
-                                        list_ele.append(item_ele);
-                                    }
-                                    list_ele.show();
-                                } else {
-                                    list_ele.hide();
-                                }
-                            } else {
-                                list_ele.hide();
-                            }
-                        };
-                    })(timestamp));
-                } else {
-                    list_ele.hide();
-                }
-            }).blur(function (){
-                $(this).parent().children('.list').hide();
-            });
+            load_local('#local-input');
+            load_remote('#remote-input');
         });
     </script>
 {% endblock %}
